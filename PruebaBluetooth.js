@@ -3,6 +3,7 @@ var onDeviceReady = function() {
     var vista_mensajes = $("#mensajes"); 
     var btnBuscar = $("#btnBuscar");
     var btnConectar = $("#btnConectar");
+    var btnPrenderLed = $("#btnPrenderLed");
     
     btnBuscar.click(function(){
         vista_devices.text("buscando dispositivos...");
@@ -20,6 +21,15 @@ var onDeviceReady = function() {
                 vista_devices.text('conectado a linvor');
             }, function(){
                 vista_devices.text('error al conectar');
+        });
+    });
+    
+    btnPrenderLed.click(function(){
+        bluetoothSerial.write('L', 
+            function(){
+                
+            }, function(){
+                vista_devices.text('error al enviar L');
         });
     });
     
