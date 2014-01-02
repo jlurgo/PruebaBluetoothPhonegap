@@ -17,7 +17,7 @@ var onDeviceReady = function() {
     
     btnConectar.click(function(){
         vista_devices.text("conectando...");
-        bluetoothSerial.connect('linvor', 
+        bluetoothSerial.connect('00:11:06:14:02:42', 
             function(){
                 vista_devices.text('conectado a linvor');
             }, function(){
