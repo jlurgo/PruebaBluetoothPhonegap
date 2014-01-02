@@ -4,6 +4,7 @@ var onDeviceReady = function() {
     var btnBuscar = $("#btnBuscar");
     var btnConectar = $("#btnConectar");
     var btnPrenderLed = $("#btnPrenderLed");
+    var btnSuscribirse = $("#btnSuscribirse");
     
     btnBuscar.click(function(){
         vista_devices.text("buscando dispositivos...");
@@ -33,12 +34,16 @@ var onDeviceReady = function() {
         });
     });
     
-    vista_devices.text("presione el boton buscar");
+    btnSuscribirse.click(function(){
+        // the success callback is called whenever data is received
+        bluetoothSerial.subscribe('\n', function (data) {
+            vista_mensajes.text(vista_mensajes.text() + JSON.stringify(data));
+        }, function(){
+            vista_devices.text('error al suscribirse');
+        });
+    });
     
-    // the success callback is called whenever data is received
-    bluetoothSerial.subscribe('\n', function (data) {
-        vista_mensajes.text(vista_devices.text() + JSON.stringify(data));
-    }, failure);
+    vista_devices.text("presione el boton buscar");   
 };
 
 $(document).ready(function() {  
