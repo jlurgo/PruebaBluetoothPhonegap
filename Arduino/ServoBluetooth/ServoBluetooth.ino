@@ -62,8 +62,8 @@ void loop()
 }
 
 void OnCaracterRecibido(char caracter){  
-    if (caracter != '\r') {
-      Serial.println("recibido:" + caracter); 
+    if (caracter != '\r' && caracter != '\n') {
+      Serial.write(caracter); 
       caracteres_recibidos += caracter;
     }
     else { //caracter == '\r'   

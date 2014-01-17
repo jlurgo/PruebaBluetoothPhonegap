@@ -59,9 +59,9 @@ var onDeviceReady = function() {
     
     $("#knob").knob({max:175, 
                      'data-linecap':'round',
-                    change:function(valor){
+                    release:function(valor){
                         vista_devices.text(valor.toString());
-                        bluetoothSerial.write(valor.toString() + '\r',
+                        bluetoothSerial.write(valor.toString() + '\n' ,
                               function(){}, 
                               function(){
                                 vista_devices.text('error al enviar el heading');
