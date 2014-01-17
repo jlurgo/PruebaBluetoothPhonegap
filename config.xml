@@ -19,4 +19,5 @@
         
     <access origin="*"/>
     <gap:plugin name="com.megster.cordova.bluetoothserial" />     
+    <gap:plugin name="org.apache.cordova.device-orientation" />
 </widget>
