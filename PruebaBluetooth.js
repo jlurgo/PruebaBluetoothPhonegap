@@ -43,7 +43,29 @@ var onDeviceReady = function() {
         });
     });
     
-    vista_devices.text("presione el boton buscar");   
+    vista_devices.text("presione el boton buscar"); 
+    
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', function(eventData) {
+//        // gamma is the left-to-right tilt in degrees, where right is positive
+//        var tiltLR = eventData.gamma;
+//    
+//        // beta is the front-to-back tilt in degrees, where front is positive
+//        var tiltFB = eventData.beta;
+//    
+        // alpha is the compass direction the device is facing in degrees
+        var dir = eventData.alpha.toString();
+        
+        bluetoothSerial.write(dir + '\r', 
+            function(){
+                
+            }, function(){
+                vista_devices.text('error al enviar el angulo');
+        });        
+      }, false);
+    } else {
+      vista_devices.text("Device Orientation Not supported.");
+    }
 };
 
 $(document).ready(function() {  
