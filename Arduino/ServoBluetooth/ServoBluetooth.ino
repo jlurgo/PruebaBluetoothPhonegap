@@ -19,51 +19,69 @@
 #include <SoftwareSerial.h>
 #include <Servo.h> 
 
-#define RxD 10
-#define TxD 11
+#define RxD_bt 10
+#define TxD_bt 11
+#define RxD_ra 12
+#define TxD_ra 13
 #define RST 5 // Encendido del Modulo
 #define KEY 4
 
-SoftwareSerial BTSerial(RxD, TxD);
+SoftwareSerial BTSerial(RxD_bt, TxD_bt);
+SoftwareSerial red_arduino(RxD_ra, TxD_ra);
 
 Servo servo_1;  // create servo object to control a servo 
                 // a maximum of eight servo objects can be created 
 
  
-int pos_servo_1 = 0;    // variable to store the servo position 
+int pos_servo_1 = 0;    // variable to store the servo position
  
 String caracteres_recibidos = "";
 
 void setup()
 {  
-  servo_1.attach(9);  // attaches the servo on pin 9 to the servo object 
-  // Configuracion del puerto serie por software
-  // para comunicar con el modulo HC-05
+  servo_1.attach(9);  
+
   BTSerial.begin(9600);
   BTSerial.flush();
-  delay(500);
+  delay(200);
+  
+  red_arduino.begin(9600);
+  red_arduino.flush();
+  delay(200);
+  
+  Serial.begin(9600);
+  Serial.println("Ready");  
+  delay(200);
   
   servo_1.write(pos_servo_1);
-  
-  // Configuramos el puerto serie de Arduino para Debug
-  Serial.begin(9600);
-  Serial.println("Ready");
 }
 
 void loop()
 {
   if(Serial.available()){
-    OnCaracterRecibido(Serial.read());
+    char caracter = Serial.read();
+    BTSerial.write(caracter); 
+    red_arduino.write(caracter); 
+    OnCaracterRecibido(caracter);
   }
   if (BTSerial.available()){
-    OnCaracterRecibido(BTSerial.read());
+    char caracter = BTSerial.read();
+    Serial.write(caracter); 
+    red_arduino.write(caracter); 
     BTSerial.flush();
+    OnCaracterRecibido(caracter);
+  }
+  if (red_arduino.available()){
+    char caracter = red_arduino.read();
+    Serial.write(caracter); 
+    BTSerial.write(caracter); 
+    red_arduino.flush();
+    OnCaracterRecibido(caracter);
   }
 }
 
 void OnCaracterRecibido(char caracter){  
     if (caracter != '\r' && caracter != '\n') {
-      Serial.write(caracter); 
       caracteres_recibidos += caracter;
     }
     else { //caracter == '\r'   

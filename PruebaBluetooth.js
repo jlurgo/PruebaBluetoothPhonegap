@@ -6,7 +6,7 @@ var onDeviceReady = function() {
     var btnPrenderLed = $("#btnPrenderLed");
     var btnSuscribirse = $("#btnSuscribirse");
     
-    var conector = new ConectorArduinoBluetooth();
+    var conector = new ConectorArduinoBluetooth({mac:'00:11:06:14:02:42'});
     
     btnConectar.click(function(){
         vista_devices.text("conectando...");
