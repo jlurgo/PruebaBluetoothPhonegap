@@ -45,17 +45,30 @@ var onDeviceReady = function() {
     
     vista_devices.text("presione el boton buscar"); 
     
-    window.compass.watchHeading(function(heading){
-        bluetoothSerial.write(heading.magneticHeading.toString() + '\r',
+//    window.compass.watchHeading(function(heading){
+//        bluetoothSerial.write(heading.magneticHeading.toString() + '\r',
+//                              function(){}, 
+//                              function(){
+//                                vista_devices.text('error al enviar el heading');
+//                                });
+//    },
+//    function(){
+//        vista_devices.text('error al obtener el heading');
+//    }, 
+//    {frequency: 200});
+    
+    $("#knob").knob({max:175, 
+                     'data-linecap':'round',
+                    change:function(valor){
+                        vista_devices.text(valor.toString());
+                        bluetoothSerial.write(valor.toString() + '\r',
                               function(){}, 
                               function(){
                                 vista_devices.text('error al enviar el heading');
                                 });
-    },
-    function(){
-        vista_devices.text('error al obtener el heading');
-    }, 
-    {frequency: 200});
+                    }});
+    
+    
 };
 
 $(document).ready(function() {  
