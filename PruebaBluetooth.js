@@ -26,12 +26,11 @@ var onDeviceReady = function() {
     });
     
     btnPrenderLed.click(function(){
-        bluetoothSerial.write('L', 
-            function(){
-                
-            }, function(){
-                vista_devices.text('error al enviar L');
-        });
+        var msg = 'La puta madre' + '\r';
+        
+        for(i=0; i<msg.length; i++){
+            bluetoothSerial.write(msg[i]);
+        }
     });
     
     btnSuscribirse.click(function(){
@@ -60,12 +59,11 @@ var onDeviceReady = function() {
     $("#knob").knob({max:175, 
                      'data-linecap':'round',
                     release:function(valor){
-                        vista_devices.text(valor.toString());
-                        bluetoothSerial.write(valor.toString() + '\n' ,
-                              function(){}, 
-                              function(){
-                                vista_devices.text('error al enviar el heading');
-                                });
+                        var msg = valor.toString() + '\n';
+                        vista_devices.text(msg);
+                        for(i=0; i<msg.length; i++){
+                            bluetoothSerial.write(msg[i]);
+                        }
                     }});
     
     
