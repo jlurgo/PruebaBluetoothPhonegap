@@ -45,8 +45,8 @@ var onDeviceReady = function() {
     
     vista_devices.text("presione el boton buscar"); 
     
-    navigator.compass.watchHeading(function(heading){
-        bluetoothSerial.write(heading.toString() + '\r',
+    window.compass.watchHeading(function(heading){
+        bluetoothSerial.write(heading.magneticHeading.toString() + '\r',
                               function(){}, 
                               function(){
                                 vista_devices.text('error al enviar el heading');
