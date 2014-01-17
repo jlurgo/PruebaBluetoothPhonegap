@@ -1,17 +1,21 @@
 var ConectorArduinoBluetooth = function(opt){
     $.extend(true, this, opt);
-    this.colaDeCaracteres = "";
-    this.conectarPorBluetooth();
+    this.colaDeCaracteres = [];
+    var _this = this;
+    setTimeout(function(){
+        _this.conectarPorBluetooth();
+    }, 1000);   
 };
 
-ConectorArduinoBluetooth.prototype.recibirMensaje(mensaje){
-    this.colaDeCaracteres += mensaje + '\n';
+ConectorArduinoBluetooth.prototype.recibirMensaje = function(mensaje){
+    this.colaDeCaracteres = this.colaDeCaracteres.concat(mensaje.split(''));
+    this.colaDeCaracteres.push('\n');
     this.enviarProximoCaracter();
 };
 
-ConectorArduinoBluetooth.prototype.enviarProximoCaracter(){
+ConectorArduinoBluetooth.prototype.enviarProximoCaracter = function(){
     var _this = this;
-    if(this.colaDeCaracteres == "") return;
+    if(this.colaDeCaracteres.length==0) return;
     var caracter_a_enviar = this.colaDeCaracteres.shift();
     bluetoothSerial.write(caracter_a_enviar);
     setTimeout(function(){
