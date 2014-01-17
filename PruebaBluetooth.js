@@ -6,14 +6,7 @@ var onDeviceReady = function() {
     var btnPrenderLed = $("#btnPrenderLed");
     var btnSuscribirse = $("#btnSuscribirse");
     
-    btnBuscar.click(function(){
-        vista_devices.text("buscando dispositivos...");
-        bluetoothSerial.list(function(devices){
-            vista_devices.text(devices.lenght);
-        }, function(){
-            vista_devices.text('error al obtener lista de dispositivos');
-        });
-    });
+    var conector = new ConectorArduinoBluetooth();
     
     btnConectar.click(function(){
         vista_devices.text("conectando...");
@@ -26,11 +19,7 @@ var onDeviceReady = function() {
     });
     
     btnPrenderLed.click(function(){
-        var msg = 'La puta madre' + '\r';
-        
-        for(i=0; i<msg.length; i++){
-            bluetoothSerial.write(msg[i]);
-        }
+        conector.recibirMensaje('La puta madre');
     });
     
     btnSuscribirse.click(function(){
@@ -41,8 +30,6 @@ var onDeviceReady = function() {
             vista_devices.text('error al suscribirse');
         });
     });
-    
-    vista_devices.text("presione el boton buscar"); 
     
 //    window.compass.watchHeading(function(heading){
 //        bluetoothSerial.write(heading.magneticHeading.toString() + '\r',
@@ -58,15 +45,9 @@ var onDeviceReady = function() {
     
     $("#knob").knob({max:175, 
                      'data-linecap':'round',
-                    release:function(valor){
-                        var msg = valor.toString() + '\n';
-                        vista_devices.text(msg);
-                        for(i=0; i<msg.length; i++){
-                            bluetoothSerial.write(msg[i]);
-                        }
-                    }});
-    
-    
+                    change:function(valor){
+                        conector.recibirMensaje(valor.toString());
+                    }});    
 };
 
 $(document).ready(function() {  
