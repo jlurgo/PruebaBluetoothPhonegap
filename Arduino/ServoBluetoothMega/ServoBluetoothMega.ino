@@ -47,15 +47,15 @@ void loop()
     }
   }  
   
-  int val_pote = analogRead(0);   
-  val_pote = map(val_pote, 0, 1023, 0, 179); 
-  if(ultimo_valor_pote > val_pote + 9 || ultimo_valor_pote < val_pote - 9){
-    servo_1.write(val_pote); 
-    String val_str = String(val_pote); 
-    val_str  += '\n';
-    EnviarMensajeATodosLosPuertosMenosA(val_str, -1);
-    ultimo_valor_pote = val_pote;
-  }
+//  int val_pote = analogRead(0);   
+//  val_pote = map(val_pote, 0, 1023, 0, 179); 
+//  if(ultimo_valor_pote > val_pote + 9 || ultimo_valor_pote < val_pote - 9){
+//    servo_1.write(val_pote); 
+//    String val_str = String(val_pote); 
+//    val_str  += '\n';
+//    EnviarMensajeATodosLosPuertosMenosA(val_str, -1);
+//    ultimo_valor_pote = val_pote;
+//  }
 }
 
 void EnviarMensajeATodosLosPuertosMenosA(String mensaje, int id_puerto){
@@ -70,14 +70,16 @@ void OnCaracterRecibido(char caracter){
     }
     else { //caracter == '\r'     
       aJsonObject* mensaje = aJson.parse(&caracteres_recibidos[0]);
-      aJsonObject* angulo_servo = aJson.getObjectItem(mensaje , "angulo");
-      
-      int pos_servo = angulo_servo->valueint;
-      
-      if(pos_servo>=0 && pos_servo<=177){
-        servo_1.write(pos_servo);
+      if (mensaje != NULL) {
+        aJsonObject* angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+        if (angulo_servo != NULL) {
+          int pos_servo = angulo_servo->valueint;
+          
+          if(pos_servo>=0 && pos_servo<=177){
+            servo_1.write(pos_servo);
+          }
+        }
       }
-      
       caracteres_recibidos = "";   
     }  
 }

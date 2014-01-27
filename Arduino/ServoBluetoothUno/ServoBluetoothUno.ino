@@ -55,14 +55,16 @@ void OnCaracterRecibido(char caracter){
     }
     else { //caracter == '\r'     
       aJsonObject* mensaje = aJson.parse(&caracteres_recibidos[0]);
-      aJsonObject* angulo_servo = aJson.getObjectItem(mensaje , "angulo");
-      
-      int pos_servo = angulo_servo->valueint;
-      
-      if(pos_servo>=0 && pos_servo<=177){
-        servo_1.write(pos_servo);
+      if (mensaje != NULL) {
+        aJsonObject* angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+        if (angulo_servo != NULL) {
+          int pos_servo = angulo_servo->valueint;
+          
+          if(pos_servo>=0 && pos_servo<=177){
+            servo_1.write(pos_servo);
+          }
+        }
       }
-      
       caracteres_recibidos = "";   
     }  
 }
