@@ -24,7 +24,7 @@ var onDeviceReady = function() {
                         conector.recibirMensaje({
                             tipoDeMensaje:'control_servo',
                             id_servo:1,
-                            angulo:valor.toString()
+                            angulo:valor
                         });
                     }});    
 };
