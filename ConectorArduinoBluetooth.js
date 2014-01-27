@@ -20,7 +20,7 @@ ConectorArduinoBluetooth.prototype.enviarProximoCaracter = function(){
     bluetoothSerial.write(caracter_a_enviar);
     setTimeout(function(){
         _this.enviarProximoCaracter();
-    }, 10); 
+    }, 1); 
 };
     
     
