@@ -1,52 +1,31 @@
 var onDeviceReady = function() {     
-    var vista_devices = $("#devices"); 
-    var vista_mensajes = $("#mensajes"); 
-    var btnBuscar = $("#btnBuscar");
-    var btnConectar = $("#btnConectar");
-    var btnPrenderLed = $("#btnPrenderLed");
-    var btnSuscribirse = $("#btnSuscribirse");
+    var txt_status = $("#status"); 
+    var mac = '20:13:06:14:05:97';
+    var conector = new ConectorArduinoBluetooth({mac:mac,
+                                                alConectar:function(){
+                                                    txt_status.text('conectado a ' + mac);
+                                                },
+                                                onErrorAlConectar:function(){
+                                                    txt_status.text('error al conectar a' + mac);
+                                                }});
     
-    var conector = new ConectorArduinoBluetooth({mac:'00:11:06:14:02:42'});
-    
-    btnConectar.click(function(){
-        vista_devices.text("conectando...");
-        bluetoothSerial.connect('00:11:06:14:02:42', 
-            function(){
-                vista_devices.text('conectado a linvor');
-            }, function(){
-                vista_devices.text('error al conectar');
-        });
-    });
-    
-    btnPrenderLed.click(function(){
-        conector.recibirMensaje('La puta madre');
-    });
-    
-    btnSuscribirse.click(function(){
-        // the success callback is called whenever data is received
-        bluetoothSerial.subscribe('\n', function (data) {
-            vista_mensajes.text(vista_mensajes.text() + JSON.stringify(data));
-        }, function(){
-            vista_devices.text('error al suscribirse');
-        });
-    });
-    
-//    window.compass.watchHeading(function(heading){
-//        bluetoothSerial.write(heading.magneticHeading.toString() + '\r',
-//                              function(){}, 
-//                              function(){
-//                                vista_devices.text('error al enviar el heading');
-//                                });
-//    },
-//    function(){
-//        vista_devices.text('error al obtener el heading');
-//    }, 
-//    {frequency: 200});
+//    btnSuscribirse.click(function(){
+//        // the success callback is called whenever data is received
+//        bluetoothSerial.subscribe('\n', function (data) {
+//            vista_mensajes.text(vista_mensajes.text() + JSON.stringify(data));
+//        }, function(){
+//            vista_devices.text('error al suscribirse');
+//        });
+//    });
     
     $("#knob").knob({max:175, 
                      'data-linecap':'round',
-                    change:function(valor){
-                        conector.recibirMensaje(valor.toString());
+                    change:function(valor){                        
+                        conector.recibirMensaje({
+                            tipoDeMensaje:'control_servo',
+                            id_servo:1,
+                            angulo:valor.toString()
+                        });
                     }});    
 };
 

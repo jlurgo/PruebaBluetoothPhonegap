@@ -8,7 +8,7 @@ var ConectorArduinoBluetooth = function(opt){
 };
 
 ConectorArduinoBluetooth.prototype.recibirMensaje = function(mensaje){
-    this.colaDeCaracteres = this.colaDeCaracteres.concat(mensaje.split(''));
+    this.colaDeCaracteres = this.colaDeCaracteres.concat(JSON.stringify(mensaje).split(''));
     this.colaDeCaracteres.push('\n');
     this.enviarProximoCaracter();
 };
@@ -29,8 +29,10 @@ ConectorArduinoBluetooth.prototype.conectarPorBluetooth = function(){
     bluetoothSerial.connect(_this.mac, 
         function(){
             console.log('conectado a ' + _this.mac);
+            _this.alConectar();
         }, function(){
             console.log('error al conectar a ' + _this.mac + " reintentando en 1 segundo...");
+            _this.onErrorAlConectar();
             setTimeout(function(){
                 _this.conectarPorBluetooth();
             }, 1000);            
