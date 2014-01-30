@@ -8,10 +8,10 @@ var ConectorArduinoBluetooth = function(opt){
 };
 
 ConectorArduinoBluetooth.prototype.recibirMensaje = function(mensaje){
-    this.colaDeCaracteres = this.colaDeCaracteres.concat(JSON.stringify(mensaje).split(''));
-    this.colaDeCaracteres.push('\n');
+    //this.colaDeCaracteres = this.colaDeCaracteres.concat(JSON.stringify(mensaje).split(''));
+    //this.colaDeCaracteres.push('\n');
     //this.enviarProximoCaracter();
-    bluetoothSerial.write(mensaje);
+    bluetoothSerial.write(mensaje + '\n');
 };
 
 ConectorArduinoBluetooth.prototype.enviarProximoCaracter = function(){

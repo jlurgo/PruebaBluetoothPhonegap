@@ -47,15 +47,15 @@ void loop()
     }
   }  
   
-//  int val_pote = analogRead(0);   
-//  val_pote = map(val_pote, 0, 1023, 0, 179); 
-//  if(ultimo_valor_pote > val_pote + 9 || ultimo_valor_pote < val_pote - 9){
-//    servo_1.write(val_pote); 
-//    String val_str = String(val_pote); 
-//    val_str  += '\n';
-//    EnviarMensajeATodosLosPuertosMenosA(val_str, -1);
-//    ultimo_valor_pote = val_pote;
-//  }
+  int val_pote = analogRead(0);   
+  val_pote = map(val_pote, 0, 1023, 0, 179); 
+  if(ultimo_valor_pote > val_pote + 9 || ultimo_valor_pote < val_pote - 9){
+    servo_1.write(val_pote); 
+    String val_str = String(val_pote); 
+    val_str  += '\n';
+    EnviarMensajeATodosLosPuertosMenosA(val_str, -1);
+    ultimo_valor_pote = val_pote;
+  }
 }
 
 void EnviarMensajeATodosLosPuertosMenosA(String mensaje, int id_puerto){
