@@ -74,7 +74,6 @@ void OnCaracterRecibido(char caracter){
       }
     }
     else { //caracter == '\r' 
-     Serial.print(F("CR")); 
       caracteres_recibidos[proximo_caracter] = '\0';   
       aJsonObject* mensaje = aJson.parse(caracteres_recibidos);
       proximo_caracter = 0;
@@ -83,15 +82,24 @@ void OnCaracterRecibido(char caracter){
       if (mensaje == NULL) {
         Serial.print(F("Error al parsear mensaje")); 
         return;
-      }         
-      aJsonObject* angulo_servo = aJson.getObjectItem(mensaje , "angulo");
-      if (angulo_servo == NULL) {
-        Serial.print(F("Error al parsear angulo")); 
+      }     
+      
+      aJsonObject* json_id_servo = aJson.getObjectItem(mensaje , "id_servo");
+      int id_servo = json_id_servo->valueint;
+      if(id_servo != 1) {
+        aJson.deleteItem(mensaje); 
         return;
-      }    
-      int pos_servo = angulo_servo->valueint;          
-      if(pos_servo>=0 && pos_servo<=177){
-         servo_1.write(pos_servo);
+      }
+      aJsonObject* json_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+      if (json_angulo_servo == NULL) {
+        Serial.print(F("Error al parsear angulo")); 
+        aJson.deleteItem(mensaje); 
+        return;
+      }  
+      
+      int angulo_servo = json_angulo_servo->valueint;          
+      if(angulo_servo>=0 && angulo_servo<=177){
+         servo_1.write(angulo_servo);
       }
       
       aJson.deleteItem(mensaje); 

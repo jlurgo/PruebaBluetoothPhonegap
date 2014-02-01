@@ -96,15 +96,22 @@ void OnMensajeRecibido(aJsonObject* mensaje, int id_puerto){
       EnviarMensajeATodosLosPuertosMenosA(mensaje_str, id_puerto);
       free(mensaje_str);
       
-      aJsonObject* angulo_servo = aJson.getObjectItem(mensaje , "angulo");
-      if (angulo_servo == NULL) {
+      aJsonObject* json_id_servo = aJson.getObjectItem(mensaje , "id_servo");
+      int id_servo = json_id_servo->valueint;
+      if(id_servo != 0) {
+        aJson.deleteItem(mensaje); 
+        return;
+      }
+      
+      aJsonObject* json_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+      if (json_angulo_servo == NULL) {
         Serial.print(F("Error al parsear angulo")); 
+        aJson.deleteItem(mensaje); 
         return;
       }   
-      int pos_servo = angulo_servo->valueint;
-      
-      if(pos_servo>=0 && pos_servo<=177){
-        servo_1.write(pos_servo);
+      int angulo_servo = json_angulo_servo->valueint;      
+      if(angulo_servo>=0 && angulo_servo<=177){
+        servo_1.write(angulo_servo);
       }
       
       aJson.deleteItem(mensaje); 
