@@ -7,6 +7,7 @@ PanelDeMandosBT.prototype.start = function(){
     var _this = this;
     this.txt_status = $("#status"); 
     this.mac = '20:13:06:14:05:97';
+    this.envioDesHabilitado = false;
     this.conector = new ConectorArduinoBluetooth({  mac: _this.mac,
                                                     alConectar:function(){
                                                         _this.txt_status.text('conectado a ' + _this.mac);

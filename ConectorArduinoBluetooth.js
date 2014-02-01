@@ -8,7 +8,7 @@ var ConectorArduinoBluetooth = function(opt){
 
 ConectorArduinoBluetooth.prototype.recibirMensaje = function(mensaje){
     var caracteres = [];
-    caracteres.concat(JSON.stringify(mensaje).split(''));
+    caracteres = caracteres.concat(JSON.stringify(mensaje).split(''));
     caracteres.push('\n');
     bluetoothSerial.write(caracteres.join(""));
 };
