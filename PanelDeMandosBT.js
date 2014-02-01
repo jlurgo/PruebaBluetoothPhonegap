@@ -20,9 +20,9 @@ PanelDeMandosBT.prototype.start = function(){
     this.conector.conectarCon({
         recibirMensaje:function(mensaje){
             if(mensaje.tipoDeMensaje=='control_servo'){     
-                _this.envioHabilitado = false;
-                _this.knobs[mensaje.id_servo].val(mensaje.angulo).trigger('change');
                 _this.envioDesHabilitado = true;
+                _this.knobs[mensaje.id_servo].val(mensaje.angulo).trigger('change');
+                _this.envioDesHabilitado = false;
             }            
         }
     });

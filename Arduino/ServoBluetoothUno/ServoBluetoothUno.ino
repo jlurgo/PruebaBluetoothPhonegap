@@ -104,7 +104,7 @@ void OnCaracterRecibido(char caracter){
       
       aJson.deleteItem(mensaje); 
       
-      Serial.print(F("freeMemory="));
-      Serial.println(freeMemory());
+      //Serial.print(F("freeMemory="));
+      //Serial.println(freeMemory());
     }  
 }

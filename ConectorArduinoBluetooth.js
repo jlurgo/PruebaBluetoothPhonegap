@@ -23,9 +23,10 @@ ConectorArduinoBluetooth.prototype.conectarPorBluetooth = function(){
         function(){
             console.log('conectado a ' + _this.mac);
             bluetoothSerial.subscribe('\n', function (data) {
-                _this.nodoVecino.recibirMensaje(JSON.stringify(data));
+                console.log('recibido:' + data);
+                _this.nodoVecino.recibirMensaje(JSON.parse(data));
             }, function(){
-            console.log('error al suscribirse');
+                console.log('error al suscribirse');
             });
             _this.alConectar();
         }, function(){
