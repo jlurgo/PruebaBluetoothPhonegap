@@ -8,12 +8,12 @@ PanelDeMandosBT.prototype.start = function(){
     this.ui = $("#panel_control_bt");
     this.txt_status = this.ui.find("#status"); 
     
-    //var clienteHTTP = new NodoClienteHTTP('http://router-vortex.herokuapp.com', 1000);             
-    //NodoRouter.instancia.conectarBidireccionalmenteCon(clienteHTTP);
+    var clienteHTTP = new NodoClienteHTTP('http://router-vortex.herokuapp.com', 500);             
+    NodoRouter.instancia.conectarBidireccionalmenteCon(clienteHTTP);
     
-    var socket = io.connect('https://router-vortex.herokuapp.com');
-    var adaptador = new NodoConectorSocket(socket);    
-    NodoRouter.instancia.conectarBidireccionalmenteCon(adaptador);
+    //var socket = io.connect('https://router-vortex.herokuapp.com');
+    //var adaptador = new NodoConectorSocket(socket);    
+    //NodoRouter.instancia.conectarBidireccionalmenteCon(adaptador);
     
     this.mac = '20:13:06:14:05:97';
     var adaptadorArduino = new NodoAdaptadorBluetoothArduino({  mac: _this.mac,
