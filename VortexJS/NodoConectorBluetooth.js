@@ -1,4 +1,4 @@
-var ConectorArduinoBluetooth = function(opt){
+var NodoConectorBluetooth = function(opt){
     $.extend(true, this, opt);
     var _this = this;
     setTimeout(function(){
@@ -6,18 +6,18 @@ var ConectorArduinoBluetooth = function(opt){
     }, 1000);   
 };
 
-ConectorArduinoBluetooth.prototype.recibirMensaje = function(mensaje){
+NodoConectorBluetooth.prototype.recibirMensaje = function(mensaje){
     var caracteres = [];
     caracteres = caracteres.concat(JSON.stringify(mensaje).split(''));
     caracteres.push('\n');
     bluetoothSerial.write(caracteres.join(""));
 };
 
-ConectorArduinoBluetooth.prototype.conectarCon = function(otro_nodo){
+NodoConectorBluetooth.prototype.conectarCon = function(otro_nodo){
     this.nodoVecino = otro_nodo;
 };
 
-ConectorArduinoBluetooth.prototype.conectarPorBluetooth = function(){
+NodoConectorBluetooth.prototype.conectarPorBluetooth = function(){
     var _this = this;
     bluetoothSerial.connect(_this.mac, 
         function(){
