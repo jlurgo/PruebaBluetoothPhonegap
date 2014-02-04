@@ -5,10 +5,18 @@ var PanelDeMandosBT = function(opt){
 
 PanelDeMandosBT.prototype.start = function(){
     var _this = this;
-    this.txt_status = $("#status"); 
+    this.ui = $("#panel_control_bt");
+    this.txt_status = this.ui.find("#status"); 
+    
+//    var clienteHTTP = new NodoClienteHTTP('http://router-vortex.herokuapp.com', 1000);             
+//    NodoRouter.instancia.conectarBidireccionalmenteCon(clienteHTTP);
+    
+    var socket = io.connect('https://router-vortex.herokuapp.com');
+    var adaptador = new NodoConectorSocket(socket);    
+    NodoRouter.instancia.conectarBidireccionalmenteCon(adaptador);
+    
     this.mac = '20:13:06:14:05:97';
-    this.envioDesHabilitado = false;
-    this.conector = new ConectorArduinoBluetooth({  mac: _this.mac,
+    var adaptadorArduino = new NodoAdaptadorBluetoothArduino({  mac: _this.mac,
                                                     alConectar:function(){
                                                         _this.txt_status.text('conectado a ' + _this.mac);
                                                     },
@@ -16,47 +24,12 @@ PanelDeMandosBT.prototype.start = function(){
                                                         _this.txt_status.text('error al conectar a' + _this.mac);
                                                     }
                                                 });
+    NodoRouter.instancia.conectarBidireccionalmenteCon(adaptadorArduino);
     
-    this.conector.conectarCon({
-        recibirMensaje:function(mensaje){
-            if(mensaje.tipoDeMensaje=='control_servo'){     
-                _this.envioDesHabilitado = true;
-                _this.knobs[mensaje.id_servo].val(mensaje.angulo).trigger('change');
-                _this.envioDesHabilitado = false;
-            }            
-        }
-    });
-    
-    this.knobs = [];
-    this.knobs.push($("#knob1"));
-    this.knobs.push($("#knob2"));
-    this.knobs[0].knob({max:175, 
-        angleArc:180, 
-        angleOffset:90, 
-        skin:"tron",
-        linecap:"round",
-        change:function(valor){  
-            if(_this.envioDesHabilitado) return;
-            _this.conector.recibirMensaje({
-                tipoDeMensaje:'control_servo',
-                id_servo:0,
-                angulo:valor
-            });
-        }
-    });   
-    this.knobs[1].knob({max:175, 
-        angleArc:180, 
-        angleOffset:90, 
-        skin:"tron",
-        linecap:"round",
-        change:function(valor){  
-            if(_this.envioDesHabilitado) return;
-            _this.conector.recibirMensaje({
-                tipoDeMensaje:'control_servo',
-                id_servo:1,
-                angulo:valor
-            });
-        }
-    });   
+    this.panelKnobs = this.ui.find("#knobs");
+    var knob0 = new VortexKnob({id:0});
+    knob0.dibujarEn(this.panelKnobs);
+    var knob1 = new VortexKnob({id:1});
+    knob1.dibujarEn(this.panelKnobs);
     
 };
