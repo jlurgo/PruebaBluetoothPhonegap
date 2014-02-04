@@ -3,41 +3,50 @@
 #include <aJSON.h>
 #include <MemoryFree.h>
 
-#define RxD_bt 10
-#define TxD_bt 11
 #define RxD_ra 12
 #define TxD_ra 13
-#define RST 5 // Encendido del Modulo
-#define KEY 4
 
-#define CANT_PUERTOS 3
-//SoftwareSerial BTSerial(RxD_bt, TxD_bt);
-//SoftwareSerial red_arduino(RxD_ra, TxD_ra);
+#define CANT_PUERTOS 4
+#define CANT_PEDIDOS 2
 
-Servo servo_1; 
+Servo servo; 
 
 int ultimo_valor_pote = 0;
+
 String caracteres_recibidos[CANT_PUERTOS] = "";
-Stream* puertos[] = {&Serial, &Serial2, &Serial3};
+
+Stream* puertos[] = {&Serial, &Serial1 ,&Serial2, &Serial3};
+
+struct pedido
+{
+    aJsonObject *filtro;
+	void (*callback)(aJsonObject*);
+} pedidos[CANT_PEDIDOS];
+
+
 
 void setup()
 {  
-  servo_1.attach(9);  
+	servo.attach(9);  
 
-  Serial2.begin(9600);  
-  Serial3.begin(9600);  
-  Serial.begin(9600);
-  
-  servo_1.write(176);
-  delay(500);  
-  servo_1.write(0);
-  
-  for(int i=0;i<CANT_PUERTOS;i++){
-    puertos[i]->flush();
-    puertos[i]->println("Ahi va!");
-  }    
-  Serial.print(F("freeMemory="));
-  Serial.println(freeMemory());
+	Serial1.begin(9600);
+	Serial2.begin(9600);  
+	Serial3.begin(9600);  
+	Serial.begin(9600);
+
+	servo.write(176);
+	delay(500);  
+	servo.write(0);
+
+	for(int i=0;i<CANT_PUERTOS;i++){
+	puertos[i]->flush();
+	puertos[i]->println("Ahi va!");
+	}    
+	pedidos[0].filtro=aJson.parse("{\"tipo\":\"EQ\",\"clave\":\"id_servo\",\"valor\":0}");
+	pedidos[0].callback = RecibirMensajeDeControlDeServo;
+
+    pedidos[1].filtro=aJson.parse("{\"tipo\":\"EQ\",\"clave\":\"id_servo\",\"valor\":1}");
+	pedidos[1].callback = RecibirMensajeDeControlDeLed;
 }
 
 void loop()
@@ -55,10 +64,11 @@ void loop()
     aJsonObject *msg;
     msg=aJson.createObject();  
     aJson.addStringToObject(msg,"tipoDeMensaje", "control_servo");
-    aJson.addNumberToObject(msg,"id_servo", 1);
+    aJson.addNumberToObject(msg,"id_servo", 0);
     aJson.addNumberToObject(msg,"angulo", val_pote); 
     ultimo_valor_pote = val_pote;  
-    OnMensajeRecibido(msg, -1);
+    RecibirMensaje(msg, -1);
+	aJson.deleteItem(msg);
   }
 }
 
@@ -68,54 +78,83 @@ void EnviarCharATodosLosPuertosMenosA(char caracter, int id_puerto){
     } 
 }
 
-void EnviarMensajeATodosLosPuertosMenosA(String mensaje, int id_puerto){
+void EnviarMensajeATodosLosPuertosMenosA(aJsonObject* mensaje, int id_puerto_excluido){
+	char* mensaje_str = aJson.print(mensaje);
+	strcat(mensaje_str, "\n");
     for(int i=0;i<CANT_PUERTOS;i++){
-      if(i!=id_puerto)puertos[i]->print(mensaje);
+      if(i!=id_puerto_excluido)puertos[i]->print(mensaje_str);
     } 
+	free(mensaje_str);
 }
 
 void OnCaracterRecibido(char caracter, int id_puerto){  
     if (caracter != '\r' && caracter != '\n') {
       caracteres_recibidos[id_puerto] += caracter;
     }
-    else { //caracter == '\r'     
+    else { //caracter == '\r' 
         aJsonObject* mensaje = aJson.parse(&caracteres_recibidos[id_puerto][0]);
-        OnMensajeRecibido(mensaje, id_puerto);      
-        caracteres_recibidos[id_puerto] = "";   
+		if (mensaje != NULL) {
+			RecibirMensaje(mensaje, id_puerto); 
+		} else{
+			Serial.println(F("Error al parsear mensaje!")); 
+		}		
+        caracteres_recibidos[id_puerto] = "";  
+		aJson.deleteItem(mensaje); 		
     }  
 }
 
-void OnMensajeRecibido(aJsonObject* mensaje, int id_puerto){  
-      if (mensaje == NULL) {
-        Serial.print(F("Error al parsear mensaje")); 
-        return;
-      }  
-      
-      char* mensaje_str = aJson.print(mensaje);
-      strcat(mensaje_str, "\n");
-      EnviarMensajeATodosLosPuertosMenosA(mensaje_str, id_puerto);
-      free(mensaje_str);
-      
-      aJsonObject* json_id_servo = aJson.getObjectItem(mensaje , "id_servo");
-      int id_servo = json_id_servo->valueint;
-      if(id_servo != 0) {
-        aJson.deleteItem(mensaje); 
-        return;
-      }
-      
-      aJsonObject* json_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
-      if (json_angulo_servo == NULL) {
-        Serial.print(F("Error al parsear angulo")); 
-        aJson.deleteItem(mensaje); 
-        return;
-      }   
-      int angulo_servo = json_angulo_servo->valueint;      
-      if(angulo_servo>=0 && angulo_servo<=177){
-        servo_1.write(angulo_servo);
-      }
-      
-      aJson.deleteItem(mensaje); 
-          
-      Serial.print(F("freeMemory="));
-      Serial.println(freeMemory());
+void RecibirMensaje(aJsonObject* mensaje, int id_puerto){   
+	EnviarMensajeATodosLosPuertosMenosA(mensaje, id_puerto);
+
+	for(int i=0; i<CANT_PEDIDOS; i++){
+		if(ElMensajePasaElFiltro(mensaje, pedidos[i].filtro)){
+			pedidos[i].callback(mensaje);
+		}
+	}
+}
+
+void RecibirMensajeDeControlDeServo(aJsonObject* mensaje){
+	aJsonObject* obj_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+	if (obj_angulo_servo == NULL) {
+		Serial.print(F("Error al parsear angulo")); 
+		return;
+	}   
+	int angulo_servo = obj_angulo_servo->valueint;      
+	if(angulo_servo>=0 && angulo_servo<=177){
+		servo.write(angulo_servo);
+	}
+}
+
+void RecibirMensajeDeControlDeLed(aJsonObject* mensaje){
+	aJsonObject* obj_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+	if (obj_angulo_servo == NULL) {
+		Serial.print(F("Error al parsear angulo")); 
+		return;
+	}   
+	int angulo_servo = obj_angulo_servo->valueint;      
+	if(angulo_servo>=90){
+		digitalWrite(13, 1); 
+	} else{
+		digitalWrite(13, 0); 
+	}
+}
+
+bool ElMensajePasaElFiltro(aJsonObject* mensaje, aJsonObject* filtro){
+	if (filtro == NULL) {
+		Serial.print(F("Error en el filtro")); 
+		return false;
+	}  
+	aJsonObject* obj_tipo_filtro = aJson.getObjectItem(filtro , "tipo");
+	String tipo_filtro = obj_tipo_filtro->valuestring;
+	if(tipo_filtro=="EQ"){
+		aJsonObject* obj_clave_filtro = aJson.getObjectItem(filtro , "clave");
+		char* clave_filtro = obj_clave_filtro->valuestring;
+		aJsonObject* obj_valor_filtro = aJson.getObjectItem(filtro , "valor");
+	
+		aJsonObject* obj_valor = aJson.getObjectItem(mensaje , clave_filtro);
+		if(obj_valor->type==aJson_Int && obj_valor_filtro->type==aJson_Int){
+			return(obj_valor->valueint == obj_valor_filtro->valueint);
+		}	
+	}
+	return false;
 }
