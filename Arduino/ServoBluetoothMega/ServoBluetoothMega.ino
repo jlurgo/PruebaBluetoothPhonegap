@@ -3,7 +3,7 @@
 #include <aJSON.h>
 #include <MemoryFree.h>
 
-#define CANT_PUERTOS 4
+#define CANT_PUERTOS 3
 #define CANT_PEDIDOS 2
 
 Servo servo; 
@@ -12,7 +12,7 @@ int ultimo_valor_pote = 0;
 
 String caracteres_recibidos[CANT_PUERTOS] = "";
 
-Stream* puertos[] = {&Serial, &Serial1 ,&Serial2, &Serial3};
+Stream* puertos[] = {&Serial, &Serial2, &Serial3};
 
 struct pedido
 {
@@ -27,6 +27,7 @@ void setup()
 	Serial3.begin(9600);  
 	Serial.begin(9600);
 
+        pinMode(13, HIGH);
 	servo.attach(9);  
 	servo.write(176);
 	delay(500);  
@@ -46,6 +47,7 @@ void loop()
     if(puertos[i]->available()){
       char caracter = puertos[i]->read();
       OnCaracterRecibido(caracter, i);
+      puertos[i]->flush();
     }
   }  
   

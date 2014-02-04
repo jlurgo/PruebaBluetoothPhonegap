@@ -8,27 +8,32 @@ PanelDeMandosBT.prototype.start = function(){
     this.ui = $("#panel_control_bt");
     this.txt_status = this.ui.find("#status"); 
     
-    var clienteHTTP = new NodoClienteHTTP('http://router-vortex.herokuapp.com', 500);             
-    NodoRouter.instancia.conectarBidireccionalmenteCon(clienteHTTP);
+    vx.start({verbose:true});
     
-    //var socket = io.connect('https://router-vortex.herokuapp.com');
-    //var adaptador = new NodoConectorSocket(socket);    
-    //NodoRouter.instancia.conectarBidireccionalmenteCon(adaptador);
+//    vx.conectarPorHTTP({
+//        url:'http://router-vortex.herokuapp.com',
+//        intervalo_polling: 200
+//    });    
     
-    this.mac = '20:13:06:14:05:97';
-    var adaptadorArduino = new NodoAdaptadorBluetoothArduino({  mac: _this.mac,
-                                                    alConectar:function(){
-                                                        _this.txt_status.text('conectado a ' + _this.mac);
-                                                    },
-                                                    onErrorAlConectar:function(){
-                                                        _this.txt_status.text('error al conectar a' + _this.mac);
-                                                    }
-                                                });
-    NodoRouter.instancia.conectarBidireccionalmenteCon(adaptadorArduino);
+    vx.conectarPorWebSockets({
+        url:'https://router-vortex.herokuapp.com'
+    });
+    
+    vx.conectarPorBluetoothConArduino({
+        mac: '20:13:06:14:05:97',
+        alConectar:function(){
+            _this.txt_status.text('conectado a ' + _this.mac);
+        },
+        onErrorAlConectar:function(){
+            _this.txt_status.text('error al conectar a' + _this.mac);
+        }
+    })
     
     this.panelKnobs = this.ui.find("#knobs");
+    
     var knob0 = new VortexKnob({id:0});
     knob0.dibujarEn(this.panelKnobs);
+    
     var knob1 = new VortexKnob({id:1});
     knob1.dibujarEn(this.panelKnobs);
     
