@@ -3,9 +3,6 @@
 #include <aJSON.h>
 #include <MemoryFree.h>
 
-#define RxD_ra 12
-#define TxD_ra 13
-
 #define CANT_PUERTOS 4
 #define CANT_PEDIDOS 2
 
@@ -23,25 +20,19 @@ struct pedido
 	void (*callback)(aJsonObject*);
 } pedidos[CANT_PEDIDOS];
 
-
-
 void setup()
 {  
-	servo.attach(9);  
-
 	Serial1.begin(9600);
 	Serial2.begin(9600);  
 	Serial3.begin(9600);  
 	Serial.begin(9600);
 
+	servo.attach(9);  
 	servo.write(176);
 	delay(500);  
 	servo.write(0);
 
-	for(int i=0;i<CANT_PUERTOS;i++){
-	puertos[i]->flush();
-	puertos[i]->println("Ahi va!");
-	}    
+	
 	pedidos[0].filtro=aJson.parse("{\"tipo\":\"EQ\",\"clave\":\"id_servo\",\"valor\":0}");
 	pedidos[0].callback = RecibirMensajeDeControlDeServo;
 
@@ -70,6 +61,32 @@ void loop()
     RecibirMensaje(msg, -1);
 	aJson.deleteItem(msg);
   }
+}
+
+void RecibirMensajeDeControlDeServo(aJsonObject* mensaje){
+	aJsonObject* obj_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+	if (obj_angulo_servo == NULL) {
+		Serial.print(F("Error al parsear angulo")); 
+		return;
+	}   
+	int angulo_servo = obj_angulo_servo->valueint;      
+	if(angulo_servo>=0 && angulo_servo<=177){
+		servo.write(angulo_servo);
+	}
+}
+
+void RecibirMensajeDeControlDeLed(aJsonObject* mensaje){
+	aJsonObject* obj_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
+	if (obj_angulo_servo == NULL) {
+		Serial.print(F("Error al parsear angulo")); 
+		return;
+	}   
+	int angulo_servo = obj_angulo_servo->valueint;      
+	if(angulo_servo>=90){
+		digitalWrite(13, 1); 
+	} else{
+		digitalWrite(13, 0); 
+	}
 }
 
 void EnviarCharATodosLosPuertosMenosA(char caracter, int id_puerto){
@@ -110,32 +127,6 @@ void RecibirMensaje(aJsonObject* mensaje, int id_puerto){
 		if(ElMensajePasaElFiltro(mensaje, pedidos[i].filtro)){
 			pedidos[i].callback(mensaje);
 		}
-	}
-}
-
-void RecibirMensajeDeControlDeServo(aJsonObject* mensaje){
-	aJsonObject* obj_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
-	if (obj_angulo_servo == NULL) {
-		Serial.print(F("Error al parsear angulo")); 
-		return;
-	}   
-	int angulo_servo = obj_angulo_servo->valueint;      
-	if(angulo_servo>=0 && angulo_servo<=177){
-		servo.write(angulo_servo);
-	}
-}
-
-void RecibirMensajeDeControlDeLed(aJsonObject* mensaje){
-	aJsonObject* obj_angulo_servo = aJson.getObjectItem(mensaje , "angulo");
-	if (obj_angulo_servo == NULL) {
-		Serial.print(F("Error al parsear angulo")); 
-		return;
-	}   
-	int angulo_servo = obj_angulo_servo->valueint;      
-	if(angulo_servo>=90){
-		digitalWrite(13, 1); 
-	} else{
-		digitalWrite(13, 0); 
 	}
 }
 
