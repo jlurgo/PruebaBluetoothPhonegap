@@ -10,15 +10,15 @@ PanelDeMandosBT.prototype.start = function(){
     
     vx.start({verbose:true});
     
-//    vx.conectarPorHTTP({
-//        url:'http://router-vortex.herokuapp.com',
-//        intervalo_polling: 200
-//    });    
+    vx.conectarPorHTTP({
+        url:'http://router-vortex.herokuapp.com',
+        intervalo_polling: 200
+    });    
     
-    vx.conectarPorWebSockets({
-        //url:'https://router-vortex.herokuapp.com'
-        url:'http://localhost:3000'
-    });
+//    vx.conectarPorWebSockets({
+//        url:'https://router-vortex.herokuapp.com'
+//        //url:'http://localhost:3000'
+//    });
     
     vx.conectarPorBluetoothConArduino({
         mac: '20:13:06:14:05:97',
