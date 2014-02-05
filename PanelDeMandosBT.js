@@ -16,7 +16,8 @@ PanelDeMandosBT.prototype.start = function(){
 //    });    
     
     vx.conectarPorWebSockets({
-        url:'https://router-vortex.herokuapp.com'
+        //url:'https://router-vortex.herokuapp.com'
+        url:'http://localhost:3000'
     });
     
     vx.conectarPorBluetoothConArduino({

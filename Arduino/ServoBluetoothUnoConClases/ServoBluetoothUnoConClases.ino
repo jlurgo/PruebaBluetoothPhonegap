@@ -6,18 +6,20 @@
 
 Servo servo; 
 
-int ultimo_valor_pote = 0;  
+#define RxD_ra 11
+#define TxD_ra 12
+SoftwareSerial red_arduino(RxD_ra, TxD_ra);
 
 void setup()
-{  	Serial1.begin(9600);  
-	Serial3.begin(9600);  
-	Serial.begin(9600);
+{ 	
+        Serial.begin(9600);
+	red_arduino.begin(9600);  
+
         vx.Setup();	
-        vx.AgregarPuerto(&Serial);
-        vx.AgregarPuerto(&Serial1);
-        vx.AgregarPuerto(&Serial3);       
-        vx.PedirMensajes(aJson.parse("{\"tipo\":\"EQ\",\"clave\":\"id_servo\",\"valor\":0}"), RecibirMensajeDeControlDeServo);
-        vx.PedirMensajes(aJson.parse("{\"tipo\":\"EQ\",\"clave\":\"id_servo\",\"valor\":1}"), RecibirMensajeDeControlDeLed);
+        vx.AgregarPuerto(&red_arduino); 
+        vx.AgregarPuerto(&Serial);    
+        vx.PedirMensajes(aJson.parse("{\"tipo\":\"EQ\",\"clave\":\"id_servo\",\"valor\":1}"), RecibirMensajeDeControlDeServo);
+        vx.PedirMensajes(aJson.parse("{\"tipo\":\"EQ\",\"clave\":\"id_servo\",\"valor\":0}"), RecibirMensajeDeControlDeLed);
         
         pinMode(13, HIGH);
 	servo.attach(9);  
@@ -28,23 +30,7 @@ void setup()
 
 void loop()
 { 
-	vx.Tick();
-        LeerPote();	
-}
-
-void LeerPote(){
-        int val_pote = analogRead(0);   
-	val_pote = map(val_pote, 0, 1023, 0, 179); 
-	if(ultimo_valor_pote > val_pote + 9 || ultimo_valor_pote < val_pote - 9){
-		aJsonObject *msg;
-		msg=aJson.createObject();  
-		aJson.addStringToObject(msg,"tipoDeMensaje", "control_servo");
-		aJson.addNumberToObject(msg,"id_servo", 0);
-		aJson.addNumberToObject(msg,"angulo", val_pote); 
-		ultimo_valor_pote = val_pote;  
-		vx.RecibirMensaje(msg, -1);
-		aJson.deleteItem(msg);
-	}
+	vx.Tick();	
 }
 
 void RecibirMensajeDeControlDeServo(aJsonObject* mensaje){
