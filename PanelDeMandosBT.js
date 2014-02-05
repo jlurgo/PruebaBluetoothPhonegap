@@ -22,10 +22,10 @@ PanelDeMandosBT.prototype.start = function(){
     vx.conectarPorBluetoothConArduino({
         mac: '20:13:06:14:05:97',
         alConectar:function(){
-            _this.txt_status.text('conectado a ' + _this.mac);
+            _this.txt_status.text('conectado a 20:13:06:14:05:97');
         },
         onErrorAlConectar:function(){
-            _this.txt_status.text('error al conectar a' + _this.mac);
+            _this.txt_status.text('error al conectar a 20:13:06:14:05:97');
         }
     })
     
